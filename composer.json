@@ -1,7 +1,7 @@
 {
   "name": "kitzberger/dragon-drop",
   "type": "typo3-cms-extension",
-  "description": "TYPO3 Drag'n'Drop",
+  "description": "ViewHelper to add 'copy-paste' to EXT:mask containers in the page module",
   "homepage": "https://github.com/kitzberger/dragon_drop",
   "license": [
     "GPL-2.0+"
