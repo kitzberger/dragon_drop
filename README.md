@@ -1,8 +1,6 @@
 # TYPO3 Extension dragon_drop
 
-## ViewHelper
-
-### PasteLink
+## PasteLink ViewHelper
 
 This viewhelper can be used within backend templates to provide a paste link for "clipped" CEs within mask container elements.
 
@@ -12,7 +10,8 @@ This viewhelper can be used within backend templates to provide a paste link for
       xmlns:dnd="http://typo3.org/ns/Kitzberger/DragonDrop/ViewHelpers">
 
 <div class="mask-accordion">
-    <dnd:be.pasteLink target="{processedRow}" override="{colPos:999, tx_mask_accordion_items_parent: processedRow.uid}" />
+    <dnd:be.pasteLink target="{processedRow}"
+                      override="{colPos:999, tx_mask_accordion_items_parent: processedRow.uid}" />
 
     <ul>
         <f:for each="{processedRow.tx_mask_accordion_items}" as="item">
@@ -28,14 +27,33 @@ This'll render an extra paste button into the accordion element:
 
 ![page module](Documentation/Images/page-module.png)
 
+The attribute
+
+* `target` needs to be set to a array representing the target record. Currently only the array key `pid` is being used internally.
+* `override` contains the field modifications the newly created record will be updated with. For EXT:mask containers that's at least colPos=999 and the "parent field".
+
+### Compatibility with EXT:mask
+
+In order to make this work with EXT:mask you need to make sure that the "parent field" is present in TCA. Please check the configuration module in the backend.
+
+If it's not present (yet) you need to provide it yourself, see [github.com/Gernott/mask/issues/389](https://github.com/Gernott/mask/issues/389) for details.
+
+### Prevent hidden records
+
 In case you don't want the paste record to be hidden, you can override the `hidden` property with 0 via the `override` attribute, e.g.
 
 ```xml
-<dnd:be.pasteLink target="{processedRow}" override="{colPos:999, tx_mask_accordion_items_parent: processedRow.uid, hidden:0}" />
+<dnd:be.pasteLink target="{processedRow}"
+                  override="{colPos:999, tx_mask_accordion_items_parent: processedRow.uid, hidden:0}" />
 ```
+
+### Customize button text
 
 In case you don't want the button text to be that paste icon, you can set a different button text:
 
 ```xml
-<dnd:be.pasteLink target="{processedRow}" override="{colPos:999, tx_mask_accordion_items_parent: processedRow.uid, hidden:0}">Paste here</dnd:be.pasteLink>
+<dnd:be.pasteLink target="{processedRow}"
+                  override="{colPos:999, tx_mask_accordion_items_parent: processedRow.uid, hidden:0}">
+    Paste here
+</dnd:be.pasteLink>
 ```
