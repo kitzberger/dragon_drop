@@ -2,16 +2,19 @@
 
 namespace Kitzberger\DragonDrop\ViewHelpers\Be;
 
-use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Backend\Clipboard\Clipboard;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Backend\Utility\IconUtility;
 use TYPO3\CMS\Core\Imaging\Icon;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class PasteLinkViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Be\AbstractBackendViewHelper
 {
     // We want to return HTML here, so no escaping please!
     protected $escapeOutput = false;
     protected $escapeChildren = false;
+
+    protected static $clipboard = null;
 
     /**
      * @return void
@@ -44,19 +47,19 @@ class PasteLinkViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Be\AbstractBacken
     protected function initializeClipboard()
     {
         // Start clipboard
-        $this->clipboard = GeneralUtility::makeInstance(\TYPO3\CMS\Backend\Clipboard\Clipboard::class);
+        self::$clipboard = GeneralUtility::makeInstance(Clipboard::class);
 
         // Initialize - reads the clipboard content from the user session
-        $this->clipboard->initializeClipboard();
+        self::$clipboard->initializeClipboard();
 
         // This locks the clipboard to the Normal for this request.
-        $this->clipboard->lockToNormal();
+        self::$clipboard->lockToNormal();
 
         // Clean up pad
-        $this->clipboard->cleanCurrent();
+        self::$clipboard->cleanCurrent();
 
         // Save the clipboard content
-        $this->clipboard->endClipboard();
+        self::$clipboard->endClipboard();
     }
 
     /**
@@ -70,39 +73,51 @@ class PasteLinkViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Be\AbstractBacken
         $target   = $this->arguments['target'];
         $override = $this->arguments['override'];
 
-        $pageRenderer = $this->getPageRenderer();
-        $pageRenderer->loadRequireJsModule('TYPO3/CMS/DragonDrop/Pastor');
+        $this->checkTca(array_keys($override));
 
-        if (!empty($target)) {
+        if (empty(self::$clipboard)) {
             $this->initializeClipboard();
-            $elFromTable = $this->clipboard->elFromTable('tt_content');
-            $pasteMode   = $this->clipboard->currentMode();
+        }
 
-            if (!empty($elFromTable)) {
-                $pasteItem = substr(key($elFromTable), 11);
-                $pasteRecord = BackendUtility::getRecord('tt_content', (int)$pasteItem);
-                $pasteTitle = $pasteRecord['header'] ? $pasteRecord['header'] : $pasteItem;
+        $elFromTable = self::$clipboard->elFromTable('tt_content');
+        $pasteMode   = self::$clipboard->currentMode();
 
-                $link = sprintf('
-                    <a class="btn btn-default btn-sm ext-dragon-drop-pastor"
-                       title="%s"
-                       data-mode="%s"
-                       data-source="%d"
-                       data-title="%s"
-                       data-pid="%d"
-                       data-override=\'%s\'>
-                       %s
-                    </a>',
-                    $GLOBALS['LANG']->sL('LLL:EXT:lang/Resources/Private/Language/locallang_core.xlf:cm.pasteinto'),
-                    $pasteMode,
-                    $pasteItem,
-                    $pasteTitle,
-                    $target['pid'],
-                    json_encode($override),
-                    $this->getText()
-                );
+        if (!empty($elFromTable) && !empty($target)) {
+            $pasteItem = substr(key($elFromTable), 11);
+            $pasteRecord = BackendUtility::getRecord('tt_content', (int)$pasteItem);
+            $pasteTitle = $pasteRecord['header'] ? $pasteRecord['header'] : $pasteItem;
 
-                return $link;
+            $pageRenderer = $this->getPageRenderer();
+            $pageRenderer->loadRequireJsModule('TYPO3/CMS/DragonDrop/Pastor');
+
+            $link = sprintf('
+                <a class="btn btn-default btn-sm ext-dragon-drop-pastor"
+                   title="%s"
+                   data-mode="%s"
+                   data-source="%d"
+                   data-title="%s"
+                   data-pid="%d"
+                   data-override=\'%s\'>
+                   %s
+                </a>',
+                $GLOBALS['LANG']->sL('LLL:EXT:lang/Resources/Private/Language/locallang_core.xlf:cm.pasteinto'),
+                $pasteMode,
+                $pasteItem,
+                $pasteTitle,
+                $target['pid'],
+                json_encode($override),
+                $this->getText()
+            );
+
+            return $link;
+        }
+    }
+
+    protected function checkTca($columns)
+    {
+        foreach ($columns as $column) {
+            if (empty($GLOBALS['TCA']['tt_content']['columns'][$column])) {
+                throw new \Exception('Column missing in TCA: tt_content.' . $column);
             }
         }
     }
