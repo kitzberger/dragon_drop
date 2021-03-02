@@ -71,7 +71,6 @@ class PasteLinkViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Be\AbstractBacken
         $override = $this->arguments['override'];
 
         $pageRenderer = $this->getPageRenderer();
-        $pageRenderer->loadJquery();
         $pageRenderer->loadRequireJsModule('TYPO3/CMS/DragonDrop/Pastor');
 
         if (!empty($target)) {
