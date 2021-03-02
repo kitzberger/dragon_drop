@@ -10,18 +10,18 @@ define(['jquery', 'TYPO3/CMS/Backend/AjaxDataHandler'], function($, DataHandler)
 
             var link = $(this)
 
+            var mode     = $(this).data('mode')
             var source   = $(this).data('source')
             var pid      = $(this).data('pid')
             var override = $(this).data('override')
 
             var parameters = {};
             parameters['cmd'] = {tt_content: {}};
-            parameters['cmd']['tt_content'][source] = {
-                copy: {
-                    action: 'paste',
-                    target: pid,
-                    update: override
-                }
+            parameters['cmd']['tt_content'][source] = {}
+            parameters['cmd']['tt_content'][source][mode] = {
+                action: 'paste',
+                target: pid,
+                update: override
             }
 
             // console.dir(parameters)

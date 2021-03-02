@@ -77,6 +77,7 @@ class PasteLinkViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Be\AbstractBacken
         if (!empty($target)) {
             $this->initializeClipboard();
             $elFromTable = $this->clipboard->elFromTable('tt_content');
+            $pasteMode   = $this->clipboard->currentMode();
 
             if (!empty($elFromTable)) {
                 $pasteItem = substr(key($elFromTable), 11);
@@ -86,6 +87,7 @@ class PasteLinkViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Be\AbstractBacken
                 $link = sprintf('
                     <a class="btn btn-default btn-sm ext-dragon-drop-pastor"
                        title="%s"
+                       data-mode="%s"
                        data-source="%d"
                        data-title="%s"
                        data-pid="%d"
@@ -93,6 +95,7 @@ class PasteLinkViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Be\AbstractBacken
                        %s
                     </a>',
                     $GLOBALS['LANG']->sL('LLL:EXT:lang/Resources/Private/Language/locallang_core.xlf:cm.pasteinto'),
+                    $pasteMode,
                     $pasteItem,
                     $pasteTitle,
                     $target['pid'],
