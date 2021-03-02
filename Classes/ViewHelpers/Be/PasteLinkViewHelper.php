@@ -143,6 +143,6 @@ class PasteLinkViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Be\AbstractBacken
             Icon::SIZE_SMALL
         );
 
-        return $icon->getMarkup();
+        return $icon->render();
     }
 }
