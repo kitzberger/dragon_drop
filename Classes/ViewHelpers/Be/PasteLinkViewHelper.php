@@ -41,14 +41,14 @@ class PasteLinkViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Be\AbstractBacken
             'irreChildrenField',
             'string',
             null,
-            true
+            false
         );
 
         $this->registerArgument(
             'irreParentField',
             'string',
             null,
-            true
+            false
         );
     }
 
@@ -84,16 +84,20 @@ class PasteLinkViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Be\AbstractBacken
      */
     public function render()
     {
-        // container record
-        $target   = $this->arguments['target'];
-        $override = $this->arguments['override'];
+        // prepare parameters
+        $target       = $this->arguments['target'];
+        $override     = $this->arguments['override'];
+        $irreRelation = $this->determineIrreRelation();
 
-        $irreRelation = [
-            'parent' => $this->arguments['irreParentField'],
-            'children' => $this->arguments['irreChildrenField'],
-        ];
-
-        $this->checkTca(array_keys($override));
+        // do all fields exist in TCA?
+        $this->checkTca(
+            array_unique(
+                array_merge(
+                    array_keys($override),
+                    array_values($irreRelation)
+                )
+            )
+        );
 
         if (empty(self::$clipboard)) {
             $this->initializeClipboard();
@@ -166,5 +170,30 @@ class PasteLinkViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Be\AbstractBacken
         );
 
         return $icon->render();
+    }
+
+    protected function determineIrreRelation()
+    {
+        if ($this->arguments['irreParentField'] &&
+            $this->arguments['irreChildrenField']) {
+
+            return [
+                'parent' => $this->arguments['irreParentField'],
+                'children' => $this->arguments['irreChildrenField'],
+            ];
+        }
+
+        // Assumption: it's a EXT:mask IRRE relation with a parent
+        // field ending with '_parent'
+        foreach (array_keys($this->arguments['override']) as $fieldName) {
+            if (str_ends_with($fieldName, '_parent')) {
+                return [
+                    'parent' => $fieldName,
+                    'children' => substr($fieldName, 0, -7), // strip off '_parent'
+                ];
+            }
+        }
+
+        throw new \Exception('Cannot determine IRRE relation automatically. Please specify the attributes "irreParentField" and "irreChildrenField" manually!');
     }
 }

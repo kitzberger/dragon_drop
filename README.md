@@ -11,9 +11,7 @@ This viewhelper can be used within backend templates to provide a paste link for
 
 <div class="mask-accordion">
     <dnd:be.pasteLink target="{row}"
-                      override="{colPos:999, tx_mask_accordion_items_parent: row.uid}"
-                      irreChildrenField="tx_mask_accordion_items"
-                      irreParentField="tx_mask_accordion_items_parent" />
+                      override="{colPos:999, tx_mask_accordion_items_parent: row.uid}" />
 
     <ul>
         <f:for each="{data.tx_mask_accordion_items}" as="item">
@@ -29,15 +27,24 @@ This'll render an extra paste button into the accordion element:
 
 ![page module](Documentation/Images/page-module.png)
 
-The attribute
+These are the mandatory attributes
 
-* `target` needs to be set to a array representing the target record. Currently only the array key `pid` is being used internally.
-* `override` contains the field modifications the newly created record will be updated with. For EXT:mask containers that's at least colPos=999 and the "parent field".
+* `target` which needs to be set to a array representing the target record. Currently only the array key `pid` is being used internally.
+* `override` which contains the field modifications the newly created record will be updated with. For EXT:mask containers that's at least colPos=999 and the "parent field".
 
-In order for this extensions DataHandler hook to properly do its job 2 more attributes need to be specified:
+This extension comes with a DataHandler hook that updates the "children count" field of the container after attaching the copied CE to it. The name of said "children count" field needs specified for the hook to properly do its job 2. You can do so by adding two attributes to the viewhelpers tag:
 
-* `irreChildrenField`
-* `irreParentField`
+* `irreChildrenField` (fieldname of container element that contains that "children count")
+* `irreParentField` (fieldname of child element that refers to container element)
+
+```xml
+    <dnd:be.pasteLink target="{row}"
+                      override="{colPos:999, tx_mask_accordion_items_parent: row.uid}"
+                      irreChildrenField="tx_mask_accordion_items"
+                      irreParentField="tx_mask_accordion_items_parent" />
+```
+
+In case of EXT:mask the viewhelper tries to guess those parameters so you can try without specfying them.
 
 ### Compatibility with EXT:mask
 
