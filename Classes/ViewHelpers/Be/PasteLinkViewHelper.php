@@ -55,7 +55,8 @@ class PasteLinkViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Be\AbstractBacken
     /**
      * Initializes the clipboard for generating paste links
      *
-     * @see \TYPO3\CMS\Recordlist\RecordList::main()
+     * @see \TYPO3\CMS\Recordlist\RecordList::main() (TYPO3 8)
+     * @see \TYPO3\CMS\Recordlist\RecordList\DatabaseRecordList (TYPO3 9, 10)
      * @see \TYPO3\CMS\Backend\Controller\ContextMenuController::clipboardAction()
      * @see \TYPO3\CMS\Filelist\Controller\FileListController::indexAction()
      */
