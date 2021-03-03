@@ -5,9 +5,11 @@ namespace Kitzberger\DragonDrop\ViewHelpers\Be;
 use TYPO3\CMS\Backend\Clipboard\Clipboard;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Imaging\Icon;
+use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Fluid\ViewHelpers\Be\AbstractBackendViewHelper;
 
-class PasteLinkViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Be\AbstractBackendViewHelper
+class PasteLinkViewHelper extends AbstractBackendViewHelper
 {
     // We want to return HTML here, so no escaping please!
     protected $escapeOutput = false;
@@ -157,8 +159,8 @@ class PasteLinkViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Be\AbstractBacken
 
     protected function getIcon($key)
     {
-        $iconFactory = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
-            \TYPO3\CMS\Core\Imaging\IconFactory::class
+        $iconFactory = GeneralUtility::makeInstance(
+            IconFactory::class
         );
         $icon = $iconFactory->getIcon(
             $key,
