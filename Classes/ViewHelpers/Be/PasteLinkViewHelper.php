@@ -22,6 +22,7 @@ class PasteLinkViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Be\AbstractBacken
     public function initializeArguments()
     {
         parent::initializeArguments();
+
         $this->registerArgument(
             'target',
             'array',
@@ -33,6 +34,20 @@ class PasteLinkViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Be\AbstractBacken
             'override',
             'array',
             [],
+            true
+        );
+
+        $this->registerArgument(
+            'irreChildrenField',
+            'string',
+            null,
+            true
+        );
+
+        $this->registerArgument(
+            'irreParentField',
+            'string',
+            null,
             true
         );
     }
@@ -73,6 +88,11 @@ class PasteLinkViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Be\AbstractBacken
         $target   = $this->arguments['target'];
         $override = $this->arguments['override'];
 
+        $irreRelation = [
+            'parent' => $this->arguments['irreParentField'],
+            'children' => $this->arguments['irreChildrenField'],
+        ];
+
         $this->checkTca(array_keys($override));
 
         if (empty(self::$clipboard)) {
@@ -97,7 +117,8 @@ class PasteLinkViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Be\AbstractBacken
                    data-source="%d"
                    data-title="%s"
                    data-pid="%d"
-                   data-override=\'%s\'>
+                   data-override=\'%s\'
+                   data-irre=\'%s\'>
                    %s
                 </a>',
                 $GLOBALS['LANG']->sL('LLL:EXT:lang/Resources/Private/Language/locallang_core.xlf:cm.pasteinto'),
@@ -106,6 +127,7 @@ class PasteLinkViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Be\AbstractBacken
                 $pasteTitle,
                 $target['pid'],
                 json_encode($override),
+                json_encode($irreRelation),
                 $this->getText()
             );
 

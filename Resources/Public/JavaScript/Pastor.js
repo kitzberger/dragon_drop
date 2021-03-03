@@ -14,6 +14,7 @@ define(['jquery', 'TYPO3/CMS/Backend/AjaxDataHandler'], function($, DataHandler)
             var source   = $(this).data('source')
             var pid      = $(this).data('pid')
             var override = $(this).data('override')
+            var irre     = $(this).data('irre')
 
             var parameters = {};
             parameters['cmd'] = {tt_content: {}};
@@ -23,9 +24,11 @@ define(['jquery', 'TYPO3/CMS/Backend/AjaxDataHandler'], function($, DataHandler)
                 target: pid,
                 update: override
             }
+            parameters['data'] = {dragon_drop_irre: irre};
 
             // console.dir(parameters)
 
+            // SimpleDataHandlerController::processAjaxRequest
             DataHandler.process(parameters).done(function(response) {
                 // console.dir('done')
                 // console.dir(response)

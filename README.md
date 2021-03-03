@@ -11,7 +11,9 @@ This viewhelper can be used within backend templates to provide a paste link for
 
 <div class="mask-accordion">
     <dnd:be.pasteLink target="{row}"
-                      override="{colPos:999, tx_mask_accordion_items_parent: row.uid}" />
+                      override="{colPos:999, tx_mask_accordion_items_parent: row.uid}"
+                      irreChildrenField="tx_mask_accordion_items"
+                      irreParentField="tx_mask_accordion_items_parent" />
 
     <ul>
         <f:for each="{data.tx_mask_accordion_items}" as="item">
@@ -31,6 +33,11 @@ The attribute
 
 * `target` needs to be set to a array representing the target record. Currently only the array key `pid` is being used internally.
 * `override` contains the field modifications the newly created record will be updated with. For EXT:mask containers that's at least colPos=999 and the "parent field".
+
+In order for this extensions DataHandler hook to properly do its job 2 more attributes need to be specified:
+
+* `irreChildrenField`
+* `irreParentField`
 
 ### Compatibility with EXT:mask
 
