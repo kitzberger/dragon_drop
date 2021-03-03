@@ -10,11 +10,11 @@ This viewhelper can be used within backend templates to provide a paste link for
       xmlns:dnd="http://typo3.org/ns/Kitzberger/DragonDrop/ViewHelpers">
 
 <div class="mask-accordion">
-    <dnd:be.pasteLink target="{processedRow}"
-                      override="{colPos:999, tx_mask_accordion_items_parent: processedRow.uid}" />
+    <dnd:be.pasteLink target="{row}"
+                      override="{colPos:999, tx_mask_accordion_items_parent: row.uid}" />
 
     <ul>
-        <f:for each="{processedRow.tx_mask_accordion_items}" as="item">
+        <f:for each="{data.tx_mask_accordion_items}" as="item">
             <li>
                 {item.header} (id={item.uid})
             </li>
@@ -43,8 +43,8 @@ If it's not present (yet) you need to provide it yourself, see [github.com/Gerno
 In case you don't want the paste record to be hidden, you can override the `hidden` property with 0 via the `override` attribute, e.g.
 
 ```xml
-<dnd:be.pasteLink target="{processedRow}"
-                  override="{colPos:999, tx_mask_accordion_items_parent: processedRow.uid, hidden:0}" />
+<dnd:be.pasteLink target="{row}"
+                  override="{colPos:999, tx_mask_accordion_items_parent: row.uid, hidden:0}" />
 ```
 
 ### Customize button text
@@ -52,8 +52,7 @@ In case you don't want the paste record to be hidden, you can override the `hidd
 In case you don't want the button text to be that paste icon, you can set a different button text:
 
 ```xml
-<dnd:be.pasteLink target="{processedRow}"
-                  override="{colPos:999, tx_mask_accordion_items_parent: processedRow.uid, hidden:0}">
+<dnd:be.pasteLink target="{row}" ...>
     Paste here
 </dnd:be.pasteLink>
 ```
