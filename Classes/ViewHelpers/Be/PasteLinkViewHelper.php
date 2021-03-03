@@ -116,8 +116,8 @@ class PasteLinkViewHelper extends AbstractBackendViewHelper
             $pageRenderer = $this->getPageRenderer();
             $pageRenderer->loadRequireJsModule('TYPO3/CMS/DragonDrop/Pastor');
 
-            $link = sprintf('
-                <a class="btn btn-default btn-sm ext-dragon-drop-pastor"
+            $link = sprintf(
+                '<a class="btn btn-default btn-sm ext-dragon-drop-pastor"
                    title="%s"
                    data-mode="%s"
                    data-source="%d"
@@ -178,7 +178,6 @@ class PasteLinkViewHelper extends AbstractBackendViewHelper
     {
         if ($this->arguments['irreParentField'] &&
             $this->arguments['irreChildrenField']) {
-
             return [
                 'parent' => $this->arguments['irreParentField'],
                 'children' => $this->arguments['irreChildrenField'],
