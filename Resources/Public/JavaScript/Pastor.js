@@ -1,23 +1,23 @@
-define(['jquery', 'TYPO3/CMS/Backend/AjaxDataHandler'], function($, DataHandler) {
+define(['jquery', 'TYPO3/CMS/Backend/AjaxDataHandler', 'TYPO3/CMS/Backend/ContextMenuActions'], function($, DataHandler, ContextMenuActions) {
     var Pastor = {
-        selector: '.ext-dragon-drop-pastor'
-    };
+        selectorPaste: '.ext-dragon-drop-pastor'
+    }
 
     Pastor.initialize = function() {
         // console.log('Pastor init!')
 
-        $(Pastor.selector).on('click', function() {
+        $(Pastor.selectorPaste).on('click', function() {
 
             var link = $(this)
 
-            var mode     = $(this).data('mode')
-            var source   = $(this).data('source')
-            var pid      = $(this).data('pid')
-            var override = $(this).data('override')
-            var irre     = $(this).data('irre')
+            var mode     = link.data('mode')
+            var source   = link.data('source')
+            var pid      = link.data('pid')
+            var override = link.data('override')
+            var irre     = link.data('irre')
 
-            var parameters = {};
-            parameters['cmd'] = {tt_content: {}};
+            var parameters = {}
+            parameters['cmd'] = {tt_content: {}}
             parameters['cmd']['tt_content'][source] = {}
             parameters['cmd']['tt_content'][source][mode] = {
                 action: 'paste',
@@ -38,13 +38,11 @@ define(['jquery', 'TYPO3/CMS/Backend/AjaxDataHandler'], function($, DataHandler)
             }).fail(function(response) {
                 console.dir('fail')
                 console.dir(response)
-            });
+            })
         })
-    };
+    }
 
-   $(Pastor.initialize);
+   $(Pastor.initialize)
 
    return Pastor;
-});
-
-
+})
