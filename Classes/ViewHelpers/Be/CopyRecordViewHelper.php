@@ -35,13 +35,13 @@ class CopyRecordViewHelper extends AbstractViewHelper
         $pasteItem = $this->getElementFromClipboard();
         if ($uid == $pasteItem) {
             $link = sprintf(
-                '<a class="btn btn-default btn-sm" disabled
+                '<a class="btn btn-default btn-sm ext-dragon-drop-release"
                    title="%s"
                    data-table="tt_content"
                    data-uid="%d">
                    %s
                 </a>',
-                'Nope.',
+                $GLOBALS['LANG']->sL('LLL:EXT:lang/Resources/Private/Language/locallang_core.xlf:labels.clipboard.clear_clipboard'),
                 $uid,
                 $this->getText('apps-pagetree-drag-place-denied')
             );
