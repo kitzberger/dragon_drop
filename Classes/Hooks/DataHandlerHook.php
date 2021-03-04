@@ -52,8 +52,8 @@ class DataHandlerHook
 
                     // find the parent field that holds a value
                     $possibleParentFields = [];
-                    foreach($record as $fieldName => $value) {
-                        if (preg_match('/_parent$/', $fieldName) && !empty($value)) {
+                    foreach($record as $fieldName => $fieldValue) {
+                        if (preg_match('/_parent$/', $fieldName) && !empty($fieldValue)) {
                             $possibleParentFields[] = $fieldName;
                         }
                     }
