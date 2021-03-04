@@ -123,14 +123,17 @@ class PasteLinkViewHelper extends AbstractViewHelper
             ];
         }
 
-        // Assumption: it's a EXT:mask IRRE relation with a parent
-        // field ending with '_parent'
-        foreach (array_keys($this->arguments['override']) as $fieldName) {
-            if (preg_match('/_parent$/', $fieldName)) {
-                return [
-                    'parent' => $fieldName,
-                    'children' => substr($fieldName, 0, -7), // strip off '_parent'
-                ];
+        if (isset($this->arguments['override']['colPos']) &&
+            $this->arguments['override']['colPos'] == 999) {
+            // Assumption: with colPos 999 it's most likely a EXT:mask container
+            // with IRRE relation having the parent field ending with '_parent'
+            foreach (array_keys($this->arguments['override']) as $fieldName) {
+                if (preg_match('/_parent$/', $fieldName)) {
+                    return [
+                        'parent' => $fieldName,
+                        'children' => substr($fieldName, 0, -7), // strip off '_parent'
+                    ];
+                }
             }
         }
 
