@@ -126,7 +126,7 @@ class PasteLinkViewHelper extends AbstractViewHelper
         // Assumption: it's a EXT:mask IRRE relation with a parent
         // field ending with '_parent'
         foreach (array_keys($this->arguments['override']) as $fieldName) {
-            if (str_ends_with($fieldName, '_parent')) {
+            if (preg_match('/_parent$/', $fieldName)) {
                 return [
                     'parent' => $fieldName,
                     'children' => substr($fieldName, 0, -7), // strip off '_parent'
