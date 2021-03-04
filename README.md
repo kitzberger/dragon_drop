@@ -1,8 +1,24 @@
 # TYPO3 Extension dragon_drop
 
+## CopyRecord/CutRecord ViewHelper
+
+These two viewhelpers can be used within backend templates to provide "copy CE" and "cut CE" links:
+
+```xml
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:dnd="http://typo3.org/ns/Kitzberger/DragonDrop/ViewHelpers">
+
+<div class="mask-element">
+    <dnd:be.copyRecord uid="{row.uid}" />
+    <dnd:be.cutRecord uid="{row.uid}" />
+    <h4>{row.header}</h4>
+</div>
+```
+
 ## PasteLink ViewHelper
 
-This viewhelper can be used within backend templates to provide a paste link for "clipped" CEs within mask container elements.
+This viewhelper can be used within backend templates to provide a paste link for "clipped" CEs within container elements.
 
 ```xml
 <html data-namespace-typo3-fluid="true"

@@ -17,6 +17,14 @@ class CutRecordViewHelper extends AbstractViewHelper
             null,
             true
         );
+
+        $this->registerArgument(
+            'table',
+            'string',
+            null,
+            false,
+            'tt_content'
+        );
     }
 
     /**
@@ -31,17 +39,19 @@ class CutRecordViewHelper extends AbstractViewHelper
 
         // prepare parameters
         $uid = $this->arguments['uid'];
+        $table = $this->arguments['table'];
 
         $pasteItem = $this->getElementFromClipboard();
         if ($uid == $pasteItem) {
             $link = sprintf(
                 '<a class="btn btn-default btn-sm ext-dragon-drop-release"
                    title="%s"
-                   data-table="tt_content"
+                   data-table="%s"
                    data-uid="%d">
                    %s
                 </a>',
                 $GLOBALS['LANG']->sL('LLL:EXT:lang/Resources/Private/Language/locallang_core.xlf:labels.clipboard.clear_clipboard'),
+                htmlspecialchars($table),
                 $uid,
                 $this->getText('apps-pagetree-drag-place-denied')
             );
@@ -49,11 +59,12 @@ class CutRecordViewHelper extends AbstractViewHelper
             $link = sprintf(
                 '<a class="btn btn-default btn-sm ext-dragon-drop-cutter"
                    title="%s"
-                   data-table="tt_content"
+                   data-table="%s"
                    data-uid="%d">
                    %s
                 </a>',
                 $GLOBALS['LANG']->sL('LLL:EXT:lang/Resources/Private/Language/locallang_core.xlf:cm.cut'),
+                htmlspecialchars($table),
                 $uid,
                 $this->getText('actions-edit-cut')
             );
