@@ -10,7 +10,7 @@ define(['jquery', 'TYPO3/CMS/Backend/AjaxDataHandler', 'TYPO3/CMS/Backend/Contex
 
             var link = $(this)
 
-            var mode     = link.data('mode')
+            var command  = link.data('mode') === 'copy' ? 'copy' : 'move';
             var source   = link.data('source')
             var pid      = link.data('pid')
             var override = link.data('override')
@@ -19,7 +19,7 @@ define(['jquery', 'TYPO3/CMS/Backend/AjaxDataHandler', 'TYPO3/CMS/Backend/Contex
             var parameters = {}
             parameters['cmd'] = {tt_content: {}}
             parameters['cmd']['tt_content'][source] = {}
-            parameters['cmd']['tt_content'][source][mode] = {
+            parameters['cmd']['tt_content'][source][command] = {
                 action: 'paste',
                 target: pid,
                 update: override

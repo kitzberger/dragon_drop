@@ -2,10 +2,11 @@
 
 namespace Kitzberger\DragonDrop\Hooks;
 
-use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class DataHandlerHook
 {
@@ -44,6 +45,30 @@ class DataHandlerHook
                     }
 
                     unset($dataHandler->datamap['dragon_drop_irre']);
+                }
+            } elseif ($command === 'move') {
+                $record = BackendUtility::getRecord($table, $id);
+
+                if ($record['colPos'] == 999) {
+                    // record has probably been inside a EXT:mask IRRE relation!
+
+                    // find the parent field that holds a value
+                    $possibleParentFields = [];
+                    foreach($record as $fieldName => $value) {
+                        if (preg_match('/_parent$/', $fieldName) && !empty($value)) {
+                            $possibleParentFields[] = $fieldName;
+                        }
+                    }
+                    if (count($possibleParentFields) === 1) {
+                        // unset the parent field
+                        $pasteDatamap[$table][$id][$possibleParentFields[0]] = 0;
+                    } else {
+                        // somethings weird!
+                        // flashmessages don't seem to be working from here ;-/
+                        // maybe use DataHandlers->log() instead?!
+                    }
+
+                    #var_dump($record['colPos'], $possibleParentFields, $pasteUpdate, $pasteDatamap); die('DIE!!');
                 }
             }
         }
