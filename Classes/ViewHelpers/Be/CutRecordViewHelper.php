@@ -42,7 +42,8 @@ class CutRecordViewHelper extends AbstractViewHelper
         $table = $this->arguments['table'];
 
         $pasteItem = $this->getElementFromClipboard();
-        if ($uid == $pasteItem) {
+        $pasteMode = self::$clipboard->currentMode();
+        if ($uid == $pasteItem && $pasteMode == 'cut') {
             $link = sprintf(
                 '<a class="btn btn-default btn-sm ext-dragon-drop-release"
                    title="%s"
@@ -53,7 +54,7 @@ class CutRecordViewHelper extends AbstractViewHelper
                 $GLOBALS['LANG']->sL('LLL:EXT:lang/Resources/Private/Language/locallang_core.xlf:labels.clipboard.clear_clipboard'),
                 htmlspecialchars($table),
                 $uid,
-                $this->getText('apps-pagetree-drag-place-denied')
+                $this->getText('actions-edit-cut-release')
             );
         } else {
             $link = sprintf(
