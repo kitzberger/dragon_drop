@@ -24,29 +24,27 @@ class DataHandlerHook
     public function processCmdmap_postProcess($command, $table, $id, $value, $dataHandler, $pasteUpdate, &$pasteDatamap)
     {
         if ($table === 'tt_content') {
-            if ($command === 'copy') {
-                if (isset($dataHandler->datamap['dragon_drop_irre'])) {
-                    $irreRelation  = $dataHandler->datamap['dragon_drop_irre'];
-                    $parentField   = $irreRelation['parent'];
-                    $childrenField = $irreRelation['children'];
+            if ($command === 'copy' && isset($dataHandler->datamap['dragon_drop_irre'])) {
+                $irreRelation  = $dataHandler->datamap['dragon_drop_irre'];
+                $parentField   = $irreRelation['parent'];
+                $childrenField = $irreRelation['children'];
 
-                    if ($pasteUpdate[$parentField]) {
-                        // container element
-                        $parentUid = $pasteUpdate[$parentField];
+                if ($pasteUpdate[$parentField]) {
+                    // container element
+                    $parentUid = $pasteUpdate[$parentField];
 
-                        // get a list of all child element uids of this container element
-                        $children = $this->getChildrenUids($table, $parentField, $parentUid);
+                    // get a list of all child element uids of this container element
+                    $children = $this->getChildrenUids($table, $parentField, $parentUid);
 
-                        // add the new elements to this list
-                        $children = array_merge($children, array_keys($pasteDatamap[$table]));
+                    // add the new elements to this list
+                    $children = array_merge($children, array_keys($pasteDatamap[$table]));
 
-                        // set full list
-                        $pasteDatamap[$table][$parentUid][$childrenField] = join(',', $children);
-                    }
-
-                    unset($dataHandler->datamap['dragon_drop_irre']);
+                    // set full list
+                    $pasteDatamap[$table][$parentUid][$childrenField] = join(',', $children);
                 }
-            } elseif ($command === 'move') {
+
+                unset($dataHandler->datamap['dragon_drop_irre']);
+            } elseif ($command === 'copy' || $command === 'move') {
                 $record = BackendUtility::getRecord($table, $id);
 
                 if ($record['colPos'] == 999) {
@@ -61,6 +59,7 @@ class DataHandlerHook
                     }
                     if (count($possibleParentFields) === 1) {
                         // unset the parent field
+                        $id = $command === 'move' ? $id : $dataHandler->copyMappingArray[$table][$id];
                         $pasteDatamap[$table][$id][$possibleParentFields[0]] = 0;
                     } else {
                         // somethings weird!
