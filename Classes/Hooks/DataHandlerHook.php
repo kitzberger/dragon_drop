@@ -57,7 +57,7 @@ class DataHandlerHook
                 }
 
                 #var_dump($this->recordBefore, $this->recordAfter);
-                #var_dump($this->parentFieldBefore, $this->childrenFieldBefore, $this->parentFieldAfter, $this->childrenFieldAfter);
+                #var_dump($this->parentFieldBefore, $this->childrenFieldBefore, $this->parentFieldAfter, $this->childrenFieldAfter); die();
             }
         }
     }
@@ -87,52 +87,68 @@ class DataHandlerHook
 
                     #var_dump($childUid, $pasteUpdate, $pasteDatamap); die('DIE!!');
 
-                    // -------------------------------------------------
-                    // Case one: move from colPos 999 to regular column
-                    // -------------------------------------------------
-                    if ($this->recordBefore['colPos'] == 999 && $this->recordAfter['colPos'] != 999) {
-                        // update child: unset the one parent field
-                        $pasteDatamap[$table][$childUid][$this->parentFieldBefore] = 0;
+                    try {
+                        // -------------------------------------------------
+                        // Case one: move from colPos 999 to regular column
+                        // -------------------------------------------------
+                        if ($this->recordBefore['colPos'] == 999 && $this->recordAfter['colPos'] != 999) {
+                            if ($this->parentFieldBefore) {
+                                // update child: unset the one parent field
+                                $pasteDatamap[$table][$childUid][$this->parentFieldBefore] = 0;
 
-                        // update parent: update counter field
-                        $parentUid = $this->recordBefore[$this->parentFieldBefore];
-                        $childrenUids = $this->getChildrenUids($table, $this->parentFieldBefore, $parentUid);
-                        $childrenUids = array_diff($childrenUids, [$childUid]); // remove child
-                        $pasteDatamap[$table][$parentUid][$this->childrenFieldBefore] = join(',', $childrenUids);
-                    }
+                                // update parent: update counter field
+                                $parentUid = $this->recordBefore[$this->parentFieldBefore];
+                                $childrenUids = $this->getChildrenUids($table, $this->parentFieldBefore, $parentUid);
+                                $childrenUids = array_diff($childrenUids, [$childUid]); // remove child
+                                $pasteDatamap[$table][$parentUid][$this->childrenFieldBefore] = join(',', $childrenUids);
+                            } else {
+                                $dataHandler->newlog('Can\'t move element from mask to regular column due to missing parentFieldBefore!', 1);
+                            }
+                        }
 
-                    // -------------------------------------------------
-                    // Case two: move from regular column to colPos 999
-                    // -------------------------------------------------
-                    if ($this->recordBefore['colPos'] != 999 && $this->recordAfter['colPos'] == 999) {
-                        // update child: set the one parent field
-                        $pasteDatamap[$table][$childUid][$this->parentFieldAfter] = $this->recordAfter[$this->parentFieldAfter];
+                        // -------------------------------------------------
+                        // Case two: move from regular column to colPos 999
+                        // -------------------------------------------------
+                        if ($this->recordBefore['colPos'] != 999 && $this->recordAfter['colPos'] == 999) {
+                            if ($this->parentFieldAfter) {
+                                // update child: set the one parent field
+                                $pasteDatamap[$table][$childUid][$this->parentFieldAfter] = $this->recordAfter[$this->parentFieldAfter];
 
-                        // update parent: update counter field
-                        $parentUid = $this->recordAfter[$this->parentFieldAfter];
-                        $childrenUids = $this->getChildrenUids($table, $this->parentFieldAfter, $parentUid);
-                        $childrenUids = array_merge($childrenUids, [$childUid]); // add child
-                        $pasteDatamap[$table][$parentUid][$this->childrenFieldAfter] = join(',', $childrenUids);
-                    }
+                                // update parent: update counter field
+                                $parentUid = $this->recordAfter[$this->parentFieldAfter];
+                                $childrenUids = $this->getChildrenUids($table, $this->parentFieldAfter, $parentUid);
+                                $childrenUids = array_merge($childrenUids, [$childUid]); // add child
+                                $pasteDatamap[$table][$parentUid][$this->childrenFieldAfter] = join(',', $childrenUids);
+                            } else {
+                                $dataHandler->newlog('Can\'t move element from regular to mask column due to missing parentFieldAfter!', 1);
+                            }
+                        }
 
-                    // -------------------------------------------------
-                    // Case three: stay in colPos 999
-                    // -------------------------------------------------
-                    if ($this->recordBefore['colPos'] == 999 && $this->recordAfter['colPos'] == 999) {
-                        // update child: unset old parent field & set the new parent field
-                        $pasteDatamap[$table][$childUid][$this->parentFieldBefore] = 0;
-                        $pasteDatamap[$table][$childUid][$this->parentFieldAfter] = $this->recordAfter[$this->parentFieldAfter];
+                        // -------------------------------------------------
+                        // Case three: stay in colPos 999
+                        // -------------------------------------------------
+                        if ($this->recordBefore['colPos'] == 999 && $this->recordAfter['colPos'] == 999) {
+                            if ($this->parentFieldBefore && $this->parentFieldAfter) {
+                                // update child: unset old parent field & set the new parent field
+                                $pasteDatamap[$table][$childUid][$this->parentFieldBefore] = 0;
+                                $pasteDatamap[$table][$childUid][$this->parentFieldAfter] = $this->recordAfter[$this->parentFieldAfter];
 
-                        // update parent: update both counter fields
-                        $parentUid = $this->recordBefore[$this->parentFieldBefore];
-                        $childrenUids = $this->getChildrenUids($table, $this->parentFieldBefore, $parentUid);
-                        $childrenUids = array_diff($childrenUids, [$childUid]); // remove child
-                        $pasteDatamap[$table][$parentUid][$this->childrenFieldBefore] = join(',', $childrenUids);
+                                // update parent: update both counter fields
+                                $parentUid = $this->recordBefore[$this->parentFieldBefore];
+                                $childrenUids = $this->getChildrenUids($table, $this->parentFieldBefore, $parentUid);
+                                $childrenUids = array_diff($childrenUids, [$childUid]); // remove child
+                                $pasteDatamap[$table][$parentUid][$this->childrenFieldBefore] = join(',', $childrenUids);
 
-                        $parentUid = $this->recordAfter[$this->parentFieldAfter];
-                        $childrenUids = $this->getChildrenUids($table, $this->parentFieldAfter, $parentUid);
-                        $childrenUids = array_merge($childrenUids, [$childUid]); // add child
-                        $pasteDatamap[$table][$parentUid][$this->childrenFieldAfter] = join(',', $childrenUids);
+                                $parentUid = $this->recordAfter[$this->parentFieldAfter];
+                                $childrenUids = $this->getChildrenUids($table, $this->parentFieldAfter, $parentUid);
+                                $childrenUids = array_merge($childrenUids, [$childUid]); // add child
+                                $pasteDatamap[$table][$parentUid][$this->childrenFieldAfter] = join(',', $childrenUids);
+                            } else {
+                                $dataHandler->newlog('Can\'t move element from one mask column to another due to missing parentFieldBefore or parentFieldAfter!', 1);
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        $dataHandler->newlog($e->getMessage(), 1);
                     }
 
                     #var_dump($childUid, $pasteUpdate, $pasteDatamap); die('DIE!!');
