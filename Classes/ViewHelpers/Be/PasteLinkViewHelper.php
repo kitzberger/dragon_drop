@@ -81,7 +81,7 @@ class PasteLinkViewHelper extends AbstractViewHelper
                    data-override=\'%s\'>
                    %s
                 </a>',
-                $GLOBALS['LANG']->sL('LLL:EXT:lang/Resources/Private/Language/locallang_core.xlf:cm.pasteinto'),
+                $GLOBALS['LANG']->sL('LLL:EXT:backend/Resources/Private/Language/locallang_layout.xlf:paste.modal.title.paste'),
                 $pasteMode,
                 $pasteItem,
                 $pasteTitle,
