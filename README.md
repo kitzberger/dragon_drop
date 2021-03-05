@@ -1,5 +1,7 @@
 # TYPO3 Extension dragon_drop
 
+This extension provides fluid viewhelpers to add copy/paste functionality to EXT:mask backend templates.
+
 ## CopyRecord/CutRecord ViewHelper
 
 These two viewhelpers can be used within backend templates to provide "copy CE" and "cut CE" links:
@@ -43,24 +45,12 @@ This'll render an extra paste button into the accordion element:
 
 ![page module](Documentation/Images/page-module.png)
 
-These are the mandatory attributes
+These are the attributes
 
 * `target` which needs to be set to a array representing the target record. Currently only the array key `pid` is being used internally.
 * `override` which contains the field modifications the newly created record will be updated with. For EXT:mask containers that's at least colPos=999 and the "parent field".
 
-This extension comes with a DataHandler hook that updates the "children count" field of the container after attaching the copied CE to it. The name of said "children count" field needs specified for the hook to properly do its job 2. You can do so by adding two attributes to the viewhelpers tag:
-
-* `irreChildrenField` (fieldname of container element that contains that "children count")
-* `irreParentField` (fieldname of child element that refers to container element)
-
-```xml
-    <dnd:be.pasteLink target="{row}"
-                      override="{colPos:999, tx_mask_accordion_items_parent: row.uid}"
-                      irreChildrenField="tx_mask_accordion_items"
-                      irreParentField="tx_mask_accordion_items_parent" />
-```
-
-In case of EXT:mask the viewhelper tries to guess those parameters so you can try without specfying them.
+This extension comes with a DataHandler hook that updates the "children count" field of the container after attaching the copied CE to it. The name of said "children count" will be derived from TCA.
 
 ### Compatibility with EXT:mask
 
