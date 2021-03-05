@@ -1,4 +1,4 @@
-define(['jquery', 'TYPO3/CMS/Backend/AjaxDataHandler', 'TYPO3/CMS/Backend/ContextMenuActions'], function($, DataHandler, ContextMenuActions) {
+define(['jquery', 'TYPO3/CMS/Backend/AjaxDataHandler', 'TYPO3/CMS/Backend/Modal', 'TYPO3/CMS/Backend/Severity'], function($, DataHandler, Modal, Severity) {
     var Pastor = {
         selectorPaste: '.ext-dragon-drop-pastor'
     }
@@ -8,12 +8,12 @@ define(['jquery', 'TYPO3/CMS/Backend/AjaxDataHandler', 'TYPO3/CMS/Backend/Contex
 
         $(Pastor.selectorPaste).on('click', function() {
 
-            var link = $(this)
+            var $anchorElement = $(this)
 
-            var command  = link.data('mode') === 'copy' ? 'copy' : 'move';
-            var source   = link.data('source')
-            var pid      = link.data('pid')
-            var override = link.data('override')
+            var command  = $anchorElement.data('mode') === 'copy' ? 'copy' : 'move';
+            var source   = $anchorElement.data('source')
+            var pid      = $anchorElement.data('pid')
+            var override = $anchorElement.data('override')
 
             var parameters = {}
             parameters['cmd'] = {tt_content: {}}
@@ -23,21 +23,47 @@ define(['jquery', 'TYPO3/CMS/Backend/AjaxDataHandler', 'TYPO3/CMS/Backend/Contex
                 target: pid,
                 update: override
             }
-            parameters['data'] = {dragon_drop_irre: irre};
 
             // console.dir(parameters)
+            var performPaste = function() {
+                // SimpleDataHandlerController::processAjaxRequest
+                DataHandler.process(parameters).done(function(response) {
+                    // console.dir('done')
+                    // console.dir(response)
+                    // if (response.hasErrors === false) {
+                    //     $anchorElement.replaceWith('<b>' + $anchorElement.data('title') + '</b>')
+                    // }
+                    top.list_frame.location.reload(true);
+                }).fail(function(response) {
+                    console.dir('fail')
+                    console.dir(response)
+                })
+            }
 
-            // SimpleDataHandlerController::processAjaxRequest
-            DataHandler.process(parameters).done(function(response) {
-                // console.dir('done')
-                // console.dir(response)
-                if (response.hasErrors === false) {
-                    link.replaceWith('<b>' + link.data('title') + '</b>')
+            var $modal = Modal.confirm(
+              $anchorElement.attr('title') + ': "' + $anchorElement.data('title') + '"',
+              $anchorElement.data('message') || TYPO3.lang['paste.modal.' + (command=='copy'?'pastecopy':'paste')],
+              Severity.info, [
+                {
+                  text: $(this).data('button-close-text') || TYPO3.lang['button.cancel'] || 'Cancel',
+                  active: true,
+                  btnClass: 'btn-default',
+                  name: 'cancel'
+                },
+                {
+                  text: $(this).data('button-ok-text') || TYPO3.lang['button.ok'] || 'OK',
+                  btnClass: 'btn-warning',
+                  name: 'ok'
                 }
-            }).fail(function(response) {
-                console.dir('fail')
-                console.dir(response)
-            })
+              ]
+            );
+
+            $modal.on('button.clicked', function(e) {
+              if (e.target.name === 'ok') {
+                performPaste();
+              }
+              Modal.dismiss();
+            });
         })
     }
 
