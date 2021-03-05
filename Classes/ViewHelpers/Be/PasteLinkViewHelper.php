@@ -61,17 +61,9 @@ class PasteLinkViewHelper extends AbstractViewHelper
             // prepare parameters
             $target       = $this->arguments['target'];
             $override     = $this->arguments['override'];
-            $irreRelation = $this->determineIrreRelation();
 
             // do all fields exist in TCA?
-            $this->checkTca(
-                array_unique(
-                    array_merge(
-                        array_keys($override),
-                        array_values($irreRelation)
-                    )
-                )
-            );
+            $this->checkTca(array_keys($override));
 
             // gather paste data
             $pasteMode   = self::$clipboard->currentMode();
@@ -86,8 +78,7 @@ class PasteLinkViewHelper extends AbstractViewHelper
                    data-source="%d"
                    data-title="%s"
                    data-pid="%d"
-                   data-override=\'%s\'
-                   data-irre=\'%s\'>
+                   data-override=\'%s\'>
                    %s
                 </a>',
                 $GLOBALS['LANG']->sL('LLL:EXT:lang/Resources/Private/Language/locallang_core.xlf:cm.pasteinto'),
@@ -96,7 +87,6 @@ class PasteLinkViewHelper extends AbstractViewHelper
                 $pasteTitle,
                 $target['pid'],
                 json_encode($override),
-                json_encode($irreRelation),
                 $this->getText('actions-document-paste-into')
             );
 
@@ -111,32 +101,5 @@ class PasteLinkViewHelper extends AbstractViewHelper
                 throw new \Exception('Column missing in TCA: tt_content.' . $column);
             }
         }
-    }
-
-    protected function determineIrreRelation()
-    {
-        if ($this->arguments['irreParentField'] &&
-            $this->arguments['irreChildrenField']) {
-            return [
-                'parent' => $this->arguments['irreParentField'],
-                'children' => $this->arguments['irreChildrenField'],
-            ];
-        }
-
-        if (isset($this->arguments['override']['colPos']) &&
-            $this->arguments['override']['colPos'] == 999) {
-            // Assumption: with colPos 999 it's most likely a EXT:mask container
-            // with IRRE relation having the parent field ending with '_parent'
-            foreach (array_keys($this->arguments['override']) as $fieldName) {
-                if (preg_match('/_parent$/', $fieldName)) {
-                    return [
-                        'parent' => $fieldName,
-                        'children' => substr($fieldName, 0, -7), // strip off '_parent'
-                    ];
-                }
-            }
-        }
-
-        throw new \Exception('Cannot determine IRRE relation automatically. Please specify the attributes "irreParentField" and "irreChildrenField" manually!');
     }
 }

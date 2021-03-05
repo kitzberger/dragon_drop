@@ -14,7 +14,6 @@ define(['jquery', 'TYPO3/CMS/Backend/AjaxDataHandler', 'TYPO3/CMS/Backend/Contex
             var source   = link.data('source')
             var pid      = link.data('pid')
             var override = link.data('override')
-            var irre     = link.data('irre')
 
             var parameters = {}
             parameters['cmd'] = {tt_content: {}}
