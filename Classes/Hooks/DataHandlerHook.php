@@ -10,9 +10,11 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class DataHandlerHook
 {
+    protected static $extConf      = [];
+    protected static $parentFields = [];
+
     private $recordBefore        = [];
     private $recordAfter         = [];
-    private $parentFields        = [];
     private $parentFieldBefore   = null;
     private $parentFieldAfter    = null;
     private $childrenFieldBefore = null;
@@ -33,10 +35,16 @@ class DataHandlerHook
     {
         if ($table === 'tt_content') {
             if ($command === 'copy' || $command === 'move') {
-                foreach($GLOBALS['TCA'][$table]['columns'] as $fieldName => $fieldConfig) {
-                    if (preg_match('/tx_(.+)_parent$/', $fieldName) &&
-                        'passthrough' === $fieldConfig['config']['type']) {
-                        $this->parentFields[] = $fieldName;
+                if ($this->getExtConf('parentFields')) {
+                    // set parent fields to list set in extension settings
+                    $this->parentFields = GeneralUtility::trimExplode(',', $this->getExtConf('parentFields'), true);
+                } else {
+                    // alternative: determine parent fields by guessing from TCA
+                    foreach($GLOBALS['TCA'][$table]['columns'] as $fieldName => $fieldConfig) {
+                        if (preg_match('/tx_(.+)_parent$/', $fieldName) &&
+                            'passthrough' === $fieldConfig['config']['type']) {
+                            $this->parentFields[] = $fieldName;
+                        }
                     }
                 }
 
@@ -179,5 +187,17 @@ class DataHandlerHook
             ->fetchAll();
 
         return array_column($children, 'uid');
+    }
+
+    protected function getExtConf($property)
+    {
+        if (empty(self::$extConf)) {
+            if ($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['dragon_drop']) {
+                self::$extConf = $GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['dragon_drop'];
+                self::$extConf = unserialize(self::$extConf);
+            }
+        }
+
+        return self::$extConf[$property] ?? null;
     }
 }
