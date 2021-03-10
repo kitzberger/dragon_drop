@@ -29,20 +29,6 @@ class PasteLinkViewHelper extends AbstractViewHelper
             [],
             true
         );
-
-        $this->registerArgument(
-            'irreChildrenField',
-            'string',
-            null,
-            false
-        );
-
-        $this->registerArgument(
-            'irreParentField',
-            'string',
-            null,
-            false
-        );
     }
 
     /**
