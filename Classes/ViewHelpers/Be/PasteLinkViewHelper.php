@@ -2,26 +2,20 @@
 
 namespace Kitzberger\DragonDrop\ViewHelpers\Be;
 
-use TYPO3\CMS\Backend\Clipboard\Clipboard;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
-use TYPO3\CMS\Backend\Utility\IconUtility;
 use TYPO3\CMS\Core\Imaging\Icon;
+use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class PasteLinkViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Be\AbstractBackendViewHelper
+class PasteLinkViewHelper extends AbstractViewHelper
 {
-    // We want to return HTML here, so no escaping please!
-    protected $escapeOutput = false;
-    protected $escapeChildren = false;
-
-    protected static $clipboard = null;
-
     /**
      * @return void
      */
     public function initializeArguments()
     {
         parent::initializeArguments();
+
         $this->registerArgument(
             'target',
             'array',
@@ -35,31 +29,20 @@ class PasteLinkViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Be\AbstractBacken
             [],
             true
         );
-    }
 
-    /**
-     * Initializes the clipboard for generating paste links
-     *
-     * @see \TYPO3\CMS\Recordlist\RecordList::main()
-     * @see \TYPO3\CMS\Backend\Controller\ContextMenuController::clipboardAction()
-     * @see \TYPO3\CMS\Filelist\Controller\FileListController::indexAction()
-     */
-    protected function initializeClipboard()
-    {
-        // Start clipboard
-        self::$clipboard = GeneralUtility::makeInstance(Clipboard::class);
+        $this->registerArgument(
+            'irreChildrenField',
+            'string',
+            null,
+            false
+        );
 
-        // Initialize - reads the clipboard content from the user session
-        self::$clipboard->initializeClipboard();
-
-        // This locks the clipboard to the Normal for this request.
-        self::$clipboard->lockToNormal();
-
-        // Clean up pad
-        self::$clipboard->cleanCurrent();
-
-        // Save the clipboard content
-        self::$clipboard->endClipboard();
+        $this->registerArgument(
+            'irreParentField',
+            'string',
+            null,
+            false
+        );
     }
 
     /**
@@ -69,29 +52,27 @@ class PasteLinkViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Be\AbstractBacken
      */
     public function render()
     {
-        // container record
-        $target   = $this->arguments['target'];
-        $override = $this->arguments['override'];
+        $pageRenderer = $this->getPageRenderer();
+        $pageRenderer->loadRequireJsModule('TYPO3/CMS/DragonDrop/Pastor');
 
-        $this->checkTca(array_keys($override));
+        $pasteItem = $this->getElementFromClipboard();
 
-        if (empty(self::$clipboard)) {
-            $this->initializeClipboard();
-        }
+        if (!empty($pasteItem)) {
+            // prepare parameters
+            $target       = $this->arguments['target'];
+            $override     = $this->arguments['override'];
 
-        $elFromTable = self::$clipboard->elFromTable('tt_content');
-        $pasteMode   = self::$clipboard->currentMode();
+            // do all fields exist in TCA?
+            $this->checkTca(array_keys($override));
 
-        if (!empty($elFromTable) && !empty($target)) {
-            $pasteItem = substr(key($elFromTable), 11);
-            $pasteRecord = BackendUtility::getRecord('tt_content', (int)$pasteItem);
+            // gather paste data
+            $pasteMode   = self::$clipboard->currentMode();
+            $pasteRecord = BackendUtility::getRecord('tt_content', $pasteItem);
             $pasteTitle = $pasteRecord['header'] ? $pasteRecord['header'] : $pasteItem;
 
-            $pageRenderer = $this->getPageRenderer();
-            $pageRenderer->loadRequireJsModule('TYPO3/CMS/DragonDrop/Pastor');
-
-            $link = sprintf('
-                <a class="btn btn-default btn-sm ext-dragon-drop-pastor"
+            // create link
+            $link = sprintf(
+                '<a class="btn btn-default btn-sm ext-dragon-drop-pastor"
                    title="%s"
                    data-mode="%s"
                    data-source="%d"
@@ -100,13 +81,13 @@ class PasteLinkViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Be\AbstractBacken
                    data-override=\'%s\'>
                    %s
                 </a>',
-                $GLOBALS['LANG']->sL('LLL:EXT:lang/Resources/Private/Language/locallang_core.xlf:cm.pasteinto'),
+                $GLOBALS['LANG']->sL('LLL:EXT:backend/Resources/Private/Language/locallang_layout.xlf:paste.modal.title.paste'),
                 $pasteMode,
                 $pasteItem,
                 $pasteTitle,
                 $target['pid'],
                 json_encode($override),
-                $this->getText()
+                $this->getText('actions-document-paste-into')
             );
 
             return $link;
@@ -120,29 +101,5 @@ class PasteLinkViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Be\AbstractBacken
                 throw new \Exception('Column missing in TCA: tt_content.' . $column);
             }
         }
-    }
-
-    protected function getText()
-    {
-        $text = $this->renderChildren();
-
-        if (is_null($text)) {
-            $text = $this->getIcon('actions-document-paste-into');
-        }
-
-        return $text;
-    }
-
-    protected function getIcon($key)
-    {
-        $iconFactory = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
-            \TYPO3\CMS\Core\Imaging\IconFactory::class
-        );
-        $icon = $iconFactory->getIcon(
-            $key,
-            Icon::SIZE_SMALL
-        );
-
-        return $icon->render();
     }
 }

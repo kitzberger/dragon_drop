@@ -1,8 +1,26 @@
 # TYPO3 Extension dragon_drop
 
+This extension provides fluid viewhelpers to add copy/paste functionality to EXT:mask backend templates.
+
+## CopyRecord/CutRecord ViewHelper
+
+These two viewhelpers can be used within backend templates to provide "copy CE" and "cut CE" links:
+
+```xml
+<html data-namespace-typo3-fluid="true"
+      xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:dnd="http://typo3.org/ns/Kitzberger/DragonDrop/ViewHelpers">
+
+<div class="mask-element">
+    <dnd:be.copyRecord uid="{row.uid}" />
+    <dnd:be.cutRecord uid="{row.uid}" />
+    <h4>{row.header}</h4>
+</div>
+```
+
 ## PasteLink ViewHelper
 
-This viewhelper can be used within backend templates to provide a paste link for "clipped" CEs within mask container elements.
+This viewhelper can be used within backend templates to provide a paste link for "clipped" CEs within container elements.
 
 ```xml
 <html data-namespace-typo3-fluid="true"
@@ -27,10 +45,12 @@ This'll render an extra paste button into the accordion element:
 
 ![page module](Documentation/Images/page-module.png)
 
-The attribute
+These are the attributes
 
-* `target` needs to be set to a array representing the target record. Currently only the array key `pid` is being used internally.
-* `override` contains the field modifications the newly created record will be updated with. For EXT:mask containers that's at least colPos=999 and the "parent field".
+* `target` which needs to be set to a array representing the target record. Currently only the array key `pid` is being used internally.
+* `override` which contains the field modifications the newly created record will be updated with. For EXT:mask containers that's at least colPos=999 and the "parent field".
+
+This extension comes with a DataHandler hook that updates the "children count" field of the container after attaching the copied CE to it. The name of said "children count" will be derived from TCA.
 
 ### Compatibility with EXT:mask
 
