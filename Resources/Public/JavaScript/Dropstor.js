@@ -2,35 +2,45 @@ define(['jquery', 'TYPO3/CMS/Backend/LayoutModule/DragDrop'], function($, DragDr
 
   var Dropstor = {
     contentIdentifier: '.t3js-page-ce',
-    dragIdentifier: '.t3-page-ce-dragitem',
-    dragHeaderIdentifier: '.t3js-page-ce-draghandle',
-    dropZoneIdentifier: '.dropstor-dropzone',
-    columnIdentifier: '.t3js-page-column',
-    validDropZoneClass: 'active',
-    dropPossibleHoverClass: 'dropstor-dropzone-possible',
-    addContentIdentifier: '.t3js-page-new-ce',
-    clone: true,
-    originalStyles: ''
+    dropZoneIdentifier: '.dropstor-dropzone',            // .t3js-page-ce-dropzone-available
+    validDropZoneClass: 'dropstor-dropzone-active',      // active
+    dropPossibleHoverClass: 'dropstor-dropzone-possible' // t3-page-ce-dropzone-possible
   };
 
   /**
    * initializes Drag+Drop for all content elements on the page
    */
   Dropstor.initialize = function() {
-    $(Dropstor.dropZoneIdentifier).droppable({
-      accept: this.contentIdentifier,
-      scope: 'tt_content',
-      tolerance: 'pointer',
-      over: function(evt, ui) {
-        Dropstor.onDropHoverOver($(ui.draggable), $(this));
-      },
-      out: function(evt, ui) {
-        Dropstor.onDropHoverOut($(ui.draggable), $(this));
-      },
-      drop: function(evt, ui) {
-        Dropstor.onDrop($(ui.draggable), $(this), evt);
-      }
-    });
+    $(Dropstor.contentIdentifier).on('dragstart', function(event, ui) {
+      console.log('start')
+      $(Dropstor.dropZoneIdentifier).addClass(Dropstor.validDropZoneClass)
+    })
+    $(Dropstor.contentIdentifier).on('dragstop', function(event, ui) {
+      console.log('stop')
+      $(Dropstor.dropZoneIdentifier).removeClass(Dropstor.validDropZoneClass)
+    })
+    $(Dropstor.dropZoneIdentifier)
+      .each(function($i) {
+        let element = $(this).closest('.t3js-page-ce')
+        console.log('Adding dropzone for ' + element.data('table') + ':' + element.data('uid'))
+      })
+      .droppable({
+        accept: this.contentIdentifier,
+        scope: 'tt_content',
+        tolerance: 'pointer',
+        over: function(evt, ui) {
+          console.log('over')
+          Dropstor.onDropHoverOver($(ui.draggable), $(this));
+        },
+        out: function(evt, ui) {
+          console.log('out')
+          Dropstor.onDropHoverOut($(ui.draggable), $(this));
+        },
+        drop: function(evt, ui) {
+          console.log('drop')
+          Dropstor.onDrop($(ui.draggable), $(this), evt);
+        }
+      });
   };
 
   /**
@@ -93,9 +103,7 @@ define(['jquery', 'TYPO3/CMS/Backend/LayoutModule/DragDrop'], function($, DragDr
             update: $droppableElement.data('override')
           }
         };
-        Dropstor.ajaxAction($droppableElement, $draggableElement, parameters, copyAction, $pasteAction);
       } else {
-        parameters['data']['tt_content'][contentElementUid] = $droppableElement.data('override');
         if ($pasteAction) {
           parameters = {
             CB: {
@@ -104,11 +112,24 @@ define(['jquery', 'TYPO3/CMS/Backend/LayoutModule/DragDrop'], function($, DragDr
             }
           };
         } else {
-          parameters['cmd']['tt_content'][contentElementUid] = {move: targetPid};
+          parameters['cmd']['tt_content'][contentElementUid] = {
+            move: {
+              action: 'paste',
+              target: targetPid,
+              update: $droppableElement.data('override')
+            }
+          };
         }
-        // fire the request, and show a message if it has failed
-        Dropstor.ajaxAction($droppableElement, $draggableElement, parameters, copyAction, $pasteAction);
       }
+
+      console.dir({
+        copyAction: copyAction,
+        parameters: parameters
+      })
+      //return
+
+      // fire the request, and show a message if it has failed
+      Dropstor.ajaxAction($droppableElement, $draggableElement, parameters, copyAction, $pasteAction);
     }
   };
 

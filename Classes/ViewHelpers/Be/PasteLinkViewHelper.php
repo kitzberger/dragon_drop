@@ -47,7 +47,6 @@ class PasteLinkViewHelper extends AbstractViewHelper
     {
         $pageRenderer = $this->getPageRenderer();
         $pageRenderer->loadRequireJsModule('TYPO3/CMS/DragonDrop/Pastor');
-        $pageRenderer->loadRequireJsModule('TYPO3/CMS/DragonDrop/Dropstor');
 
         $pasteItem = $this->getElementFromClipboard();
 
