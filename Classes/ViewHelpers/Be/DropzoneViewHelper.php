@@ -63,7 +63,7 @@ class DropzoneViewHelper extends AbstractViewHelper
 
         // create link
         $link = sprintf('
-            <div class="dropstor-dropzone" data-override=\'%s\'>x</div>
+            <div class="dropstor-dropzone" data-override=\'%s\'></div>
             ',
             json_encode($override)
         );
