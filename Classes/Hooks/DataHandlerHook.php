@@ -21,6 +21,14 @@ class DataHandlerHook
     private $childrenFieldAfter  = null;
 
     /**
+     * Build up the internal properties:
+     * - parentFieldBefore
+     * - parentFieldAfter
+     * - childrenFieldBefore
+     * - childrenFieldAfter
+     * - recordBefore
+     * - recordAfter
+     *
      * @param  string      $command
      * @param  string      $table
      * @param  int         $id
@@ -37,21 +45,21 @@ class DataHandlerHook
             if ($command === 'copy' || $command === 'move') {
                 if ($this->getExtConf('parentFields')) {
                     // set parent fields to list set in extension settings
-                    $this->parentFields = GeneralUtility::trimExplode(',', $this->getExtConf('parentFields'), true);
+                    self::$parentFields = GeneralUtility::trimExplode(',', $this->getExtConf('parentFields'), true);
                 } else {
                     // alternative: determine parent fields by guessing from TCA
                     foreach($GLOBALS['TCA'][$table]['columns'] as $fieldName => $fieldConfig) {
                         if (preg_match('/tx_(.+)_parent$/', $fieldName) &&
                             'passthrough' === $fieldConfig['config']['type']) {
-                            $this->parentFields[] = $fieldName;
+                            self::$parentFields[] = $fieldName;
                         }
                     }
                 }
 
-                $this->recordBefore = BackendUtility::getRecord($table, $id, join(',', array_merge($this->parentFields, ['colPos'])));
+                $this->recordBefore = BackendUtility::getRecord($table, $id, join(',', array_merge(self::$parentFields, ['colPos'])));
                 $this->recordAfter = $pasteUpdate;
 
-                foreach ($this->parentFields as $parentField) {
+                foreach (self::$parentFields as $parentField) {
                     if (isset($this->recordBefore[$parentField]) &&
                         !empty($this->recordBefore[$parentField])) {
                         $this->parentFieldBefore = $parentField;
