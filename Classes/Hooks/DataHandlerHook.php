@@ -168,6 +168,21 @@ class DataHandlerHook
                     }
 
                     #var_dump($childUid, $pasteUpdate, $pasteDatamap); die('DIE!!');
+                } else {
+                    // Determine correct record uid
+                    $childUid = $command === 'move' ? $id : $dataHandler->copyMappingArray[$table][$id];
+
+                    if ($this->parentFieldBefore) {
+                        // update parent: update counter field
+                        $parentUid = $this->recordBefore[$this->parentFieldBefore];
+                        $childrenUids = $this->getChildrenUids($table, $this->parentFieldBefore, $parentUid);
+                        $childrenUids = array_diff($childrenUids, [$childUid]); // remove child
+                        $pasteDatamap[$table][$parentUid][$this->childrenFieldBefore] = join(',', $childrenUids);
+
+                        // unset parent relation
+                        $pasteDatamap[$table][$childUid][$this->parentFieldBefore] = 0;
+                    }
+                    #var_dump($this->recordBefore['colPos'], $this->recordAfter['colPos'], $this->parentFieldBefore, $this->parentFieldAfter, $pasteDatamap); die();
                 }
             }
         }
