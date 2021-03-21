@@ -89,24 +89,23 @@ In case you don't want the button text to be that paste icon, you can set a diff
 
 ### WIP: Drag & Drop
 
-```html
-<div class="t3-page-ce t3js-page-ce" data-table="tt_content" data-uid="{item.uid}">
-    <div class="t3-page-ce-header t3-page-ce-header-draggable t3js-page-ce-draghandle">
-        {item.header}
-    </div>
-    <div class="t3-page-ce-body">
-        <div class="t3-page-ce-body-inner">
-            <dnd:be.pasteLink target="{item}"
-                              override="{colPos:999, tx_mask_accordion_items_parent: item.uid}" />
-            <span class="icon-actions-document-new"></span>
-            <div class="dropstor-dropzone" data-override='{"colPos":999,"tx_mask_accordion_items_parent":213090}'>Dropzone!</div>
+```xml
+<dnd:be.dropzone target="{processedRow}"
+                 override="{colPos:999, tx_kvjscontents_container_items_parent: processedRow.uid}" />
+```
 
-            <f:for each="{item.tx_mask_accordion_items}" as="subitem">
-                <div class="t3-page-ce">
-                    {subitem.header}
+If you want a CE within a container to be draggable to the outside make sure it's provided with the proper markup/classes:
+
+```xml
+<ul>
+    <f:for each="{data.tx_mask_accordion_items}" as="item">
+        <li>
+            <div class="t3-page-ce t3js-page-ce" data-table="tt_content" data-uid="{item.uid}">
+                <div class="t3-page-ce-header t3-page-ce-header-draggable t3js-page-ce-draghandle">
+                    {item.header} (id={item.uid})
                 </div>
-            </f:for>
-        </div>
-    </div>
-</div>
+            </div>
+        </li>
+    </f:for>
+</ul>
 ```
