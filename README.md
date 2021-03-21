@@ -67,6 +67,16 @@ In case you don't want the paste record to be hidden, you can override the `hidd
                   override="{colPos:999, tx_mask_accordion_items_parent: row.uid, hidden:0}" />
 ```
 
+### Allowed CTypes
+
+To prevent certain CTypes to be pasted into your mask element you can specify the `allowed` attribute:
+
+```xml
+<dnd:be.pasteLink target="{row}"
+                  override="{colPos:999, tx_mask_accordion_items_parent: row.uid}"
+                  allowed="textmedia,mask_elementX" />
+```
+
 ### Customize button text
 
 In case you don't want the button text to be that paste icon, you can set a different button text:

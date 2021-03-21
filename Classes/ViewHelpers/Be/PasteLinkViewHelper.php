@@ -31,14 +31,7 @@ class PasteLinkViewHelper extends AbstractViewHelper
         );
 
         $this->registerArgument(
-            'irreChildrenField',
-            'string',
-            null,
-            false
-        );
-
-        $this->registerArgument(
-            'irreParentField',
+            'allowed',
             'string',
             null,
             false
@@ -61,6 +54,7 @@ class PasteLinkViewHelper extends AbstractViewHelper
             // prepare parameters
             $target       = $this->arguments['target'];
             $override     = $this->arguments['override'];
+            $allowed      = GeneralUtility::trimExplode(',', $this->arguments['allowed'], true);
 
             // do all fields exist in TCA?
             $this->checkTca(array_keys($override));
@@ -69,6 +63,10 @@ class PasteLinkViewHelper extends AbstractViewHelper
             $pasteMode   = self::$clipboard->currentMode();
             $pasteRecord = BackendUtility::getRecord('tt_content', $pasteItem);
             $pasteTitle = $pasteRecord['header'] ? $pasteRecord['header'] : $pasteItem;
+
+            if ($allowed && !in_array($pasteRecord['CType'], $allowed)) {
+                return '';
+            }
 
             // create link
             $link = sprintf(
