@@ -4,7 +4,7 @@
   "description": "ViewHelper to add 'copy-paste' to EXT:mask containers in the page module",
   "homepage": "https://github.com/kitzberger/dragon_drop",
   "license": [
-    "GPL-2.0+"
+    "GPL-2.0-or-later"
   ],
   "keywords": [
     "TYPO3 CMS"
@@ -15,6 +15,11 @@
   "autoload": {
     "psr-4": {
       "Kitzberger\\DragonDrop\\": "Classes/"
+    }
+  },
+  "extra": {
+    "typo3/cms": {
+      "extension-key": "dragon_drop"
     }
   }
 }
