@@ -90,8 +90,8 @@ In case you don't want the button text to be that paste icon, you can set a diff
 ### WIP: Drag & Drop
 
 ```xml
-<dnd:be.dropzone target="{processedRow}"
-                 override="{colPos:999, tx_kvjscontents_container_items_parent: processedRow.uid}" />
+<dnd:be.dropzone target="{row}"
+                 override="{colPos:999, tx_mask_accordion_items_parent: row.uid}" />
 ```
 
 If you want a CE within a container to be draggable to the outside make sure it's provided with the proper markup/classes:
