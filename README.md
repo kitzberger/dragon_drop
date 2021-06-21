@@ -86,3 +86,21 @@ In case you don't want the button text to be that paste icon, you can set a diff
     Paste here
 </dnd:be.pasteLink>
 ```
+
+## Toggle URI viewhelpers
+
+To render URIs to (un)hide or delete records use this viewhelpers:
+
+```xml
+<a class="btn btn-default" href="{dnd:be.uri.toggleRecord(table: 'tt_content', uid:row.uid, hidden:row.hidden)}">
+    <core:icon identifier="actions-edit-hide" />
+</a>
+<a class="btn btn-default t3js-modal-trigger" href="{dnd:be.uri.toggleRecord(table: 'tt_content', uid:row.uid)}"
+   data-severity="warning"
+   data-title="{f:translate(key:'LLL:EXT:backend/Resources/Private/Language/locallang_alt_doc.xlf:label.confirm.delete_record.title')}"
+   data-content="{f:translate(key:'LLL:EXT:backend/Resources/Private/Language/locallang_alt_doc.xlf:label.confirm.delete_record.content')}"
+   data-button-close-text="{f:translate(key:'LLL:EXT:backend/Resources/Private/Language/locallang_alt_doc.xlf:buttons.confirm.delete_record.no')}"
+   data-title="{f:translate(key:'LLL:EXT:backend/Resources/Private/Language/locallang_alt_doc.xlf:deleteItem')}">
+    <core:icon identifier="actions-edit-delete" />
+</a>
+```
