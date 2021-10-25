@@ -42,7 +42,7 @@ define(['jquery', 'TYPO3/CMS/Backend/AjaxDataHandler', 'TYPO3/CMS/Backend/Modal'
 
             var $modal = Modal.confirm(
               $anchorElement.attr('title') + ': "' + $anchorElement.data('title') + '"',
-              $anchorElement.data('message') || TYPO3.lang['paste.modal.' + (command=='copy'?'pastecopy':'paste')],
+              $anchorElement.data('message') || TYPO3.lang['paste.modal.paste'],
               Severity.warning, [
                 {
                   text: $(this).data('button-close-text') || TYPO3.lang['button.cancel'] || 'Cancel',
