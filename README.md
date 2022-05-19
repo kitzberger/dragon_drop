@@ -86,3 +86,26 @@ In case you don't want the button text to be that paste icon, you can set a diff
     Paste here
 </dnd:be.pasteLink>
 ```
+
+### WIP: Drag & Drop
+
+```xml
+<dnd:be.dropzone target="{row}"
+                 override="{colPos:999, tx_mask_accordion_items_parent: row.uid}" />
+```
+
+If you want a CE within a container to be draggable to the outside make sure it's provided with the proper markup/classes:
+
+```xml
+<ul>
+    <f:for each="{data.tx_mask_accordion_items}" as="item">
+        <li>
+            <div class="t3-page-ce t3js-page-ce" data-table="tt_content" data-uid="{item.uid}">
+                <div class="t3-page-ce-header t3-page-ce-header-draggable t3js-page-ce-draghandle">
+                    {item.header} (id={item.uid})
+                </div>
+            </div>
+        </li>
+    </f:for>
+</ul>
+```

@@ -21,6 +21,14 @@ class DataHandlerHook
     private $childrenFieldAfter  = null;
 
     /**
+     * Build up the internal properties:
+     * - parentFieldBefore
+     * - parentFieldAfter
+     * - childrenFieldBefore
+     * - childrenFieldAfter
+     * - recordBefore
+     * - recordAfter
+     *
      * @param  string      $command
      * @param  string      $table
      * @param  int         $id
@@ -37,21 +45,21 @@ class DataHandlerHook
             if ($command === 'copy' || $command === 'move') {
                 if ($this->getExtConf('parentFields')) {
                     // set parent fields to list set in extension settings
-                    $this->parentFields = GeneralUtility::trimExplode(',', $this->getExtConf('parentFields'), true);
+                    self::$parentFields = GeneralUtility::trimExplode(',', $this->getExtConf('parentFields'), true);
                 } else {
                     // alternative: determine parent fields by guessing from TCA
                     foreach($GLOBALS['TCA'][$table]['columns'] as $fieldName => $fieldConfig) {
                         if (preg_match('/tx_(.+)_parent$/', $fieldName) &&
                             'passthrough' === $fieldConfig['config']['type']) {
-                            $this->parentFields[] = $fieldName;
+                            self::$parentFields[] = $fieldName;
                         }
                     }
                 }
 
-                $this->recordBefore = BackendUtility::getRecord($table, $id, join(',', array_merge($this->parentFields, ['colPos'])));
+                $this->recordBefore = BackendUtility::getRecord($table, $id, join(',', array_merge(self::$parentFields, ['colPos'])));
                 $this->recordAfter = $pasteUpdate;
 
-                foreach ($this->parentFields as $parentField) {
+                foreach (self::$parentFields as $parentField) {
                     if (isset($this->recordBefore[$parentField]) &&
                         !empty($this->recordBefore[$parentField])) {
                         $this->parentFieldBefore = $parentField;
@@ -160,6 +168,21 @@ class DataHandlerHook
                     }
 
                     #var_dump($childUid, $pasteUpdate, $pasteDatamap); die('DIE!!');
+                } else {
+                    // Determine correct record uid
+                    $childUid = $command === 'move' ? $id : $dataHandler->copyMappingArray[$table][$id];
+
+                    if ($this->parentFieldBefore) {
+                        // update parent: update counter field
+                        $parentUid = $this->recordBefore[$this->parentFieldBefore];
+                        $childrenUids = $this->getChildrenUids($table, $this->parentFieldBefore, $parentUid);
+                        $childrenUids = array_diff($childrenUids, [$childUid]); // remove child
+                        $pasteDatamap[$table][$parentUid][$this->childrenFieldBefore] = join(',', $childrenUids);
+
+                        // unset parent relation
+                        $pasteDatamap[$table][$childUid][$this->parentFieldBefore] = 0;
+                    }
+                    #var_dump($this->recordBefore['colPos'], $this->recordAfter['colPos'], $this->parentFieldBefore, $this->parentFieldAfter, $pasteDatamap); die();
                 }
             }
         }
